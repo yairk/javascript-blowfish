@@ -189,7 +189,6 @@ Blowfish.prototype = {
    * @return {string} зашифрованная строка
    */
   encryptECB: function(string) {
-    string = this.utf8Decode(string);
     var blocks = Math.ceil(string.length/8);
 
     //1. разбить строку на 8-байтные блок-и
@@ -231,7 +230,6 @@ Blowfish.prototype = {
    * @return {string} зашифрованная строка
    */
   encryptCBC: function(string, iv) {
-    string = this.utf8Decode(string);
     var blocks = Math.ceil(string.length/8);
 
     //1. разбить строку на 8-байтные блок-и
@@ -352,7 +350,6 @@ Blowfish.prototype = {
       decryptedString += this.num2block32(xL) + this.num2block32(xR);
     }
 
-    decryptedString = this.utf8Encode(decryptedString);
     return decryptedString;
   },
 
@@ -599,63 +596,6 @@ Blowfish.prototype = {
   },
 
   /**
-   * Преобразует строку в последовательность байтов utf8
-   * на один символ может приходится больше одного байта
-   * Взял этот метод из библиотеки base64:
-   * http://www.webtoolkit.info/javascript-base64.html
-   */
-  utf8Decode: function(string) {
-    var utftext = "";
-    for (var n = 0; n < string.length; n++) {
-      var c = string.charCodeAt(n);
-      if (c < 128) {
-        utftext += String.fromCharCode(c);
-      } else if (c > 127 && c < 2048) {
-        utftext += String.fromCharCode(c >> 6 | 192);
-        utftext += String.fromCharCode(c & 63 | 128);
-      } else {
-        utftext += String.fromCharCode(c >> 12 | 224);
-        utftext += String.fromCharCode(c >> 6 & 63 | 128);
-        utftext += String.fromCharCode(c & 63 | 128);
-      }
-    }
-    return utftext;
-  },
-
-  /**
-   * Преобразует байтовую-строку utf8 в строку javascript
-   */
-  utf8Encode: function (utftext) {
-    var string = "";
-    var i = 0;
-    var c = 0;
-    var c1 = 0;
-    var c2 = 0;
-
-    while ( i < utftext.length ) {
-
-      c = utftext.charCodeAt(i);
-
-      if (c < 128) {
-        string += String.fromCharCode(c);
-        i++;
-      } else if((c > 191) && (c < 224)) {
-        c1 = utftext.charCodeAt(i+1);
-        string += String.fromCharCode(((c & 31) << 6) | (c1 & 63));
-        i += 2;
-      } else {
-        c1 = utftext.charCodeAt(i+1);
-        c2 = utftext.charCodeAt(i+2);
-        string += String.fromCharCode(((c & 15) << 12) | ((c1 & 63) << 6) | (c2 & 63));
-        i += 3;
-      }
-
-    }
-
-    return string;
-  },
-
-  /**
    * Кодирует строку в base64
    * @param {string} input
    * @return {string}
@@ -664,8 +604,6 @@ Blowfish.prototype = {
     var output = "";
     var chr1, chr2, chr3, enc1, enc2, enc3, enc4;
     var i = 0;
-
-    //input = this.utf8Encode(input);
 
     while (i < input.length) {
       chr1 = input.charCodeAt(i++);
@@ -725,8 +663,6 @@ Blowfish.prototype = {
       }
 
     }
-
-    //output = this.utf8Decode(output);
 
     return output;
   },
